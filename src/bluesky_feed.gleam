@@ -13,10 +13,6 @@ fn json_to_bit_builder(obj: json.Json) {
   |> bit_builder.from_string_builder
 }
 
-fn json(x: json.Json) -> json.Json {
-  x
-}
-
 fn handler(
   env: fetch_environment.Environment,
   req: Request(mist.Body),
@@ -46,7 +42,7 @@ fn handler(
                 json.array(["https://www.w3.org/ns/did/v1"], of: json.string),
               ),
               #("id", json.string(env.service_did)),
-              #("service", json.array([service], of: json)),
+              #("service", json.preprocessed_array([service])),
             ])
           response.new(200)
           |> mist.bit_builder_response(
