@@ -13,6 +13,10 @@ fn json_to_bit_builder(obj: json.Json) {
   |> bit_builder.from_string_builder
 }
 
+fn json(x: json.Json) -> json.Json {
+  x
+}
+
 fn handler(
   env: fetch_environment.Environment,
   req: Request(mist.Body),
@@ -29,7 +33,21 @@ fn handler(
           response.new(404)
           |> mist.empty_response
         True -> {
-          let body = json.object([#("name", json.string("derp..."))])
+          let service =
+            json.object([
+              #("id", json.string("#bsky_fg")),
+              #("type", json.string("BskyFeedGenerator")),
+              #("serviceEndpoint", json.string("http://" <> env.hostname)),
+            ])
+          let body =
+            json.object([
+              #(
+                "@context",
+                json.array(["https://www.w3.org/ns/did/v1"], of: json.string),
+              ),
+              #("id", json.string(env.service_did)),
+              #("service", json.array([service], of: json)),
+            ])
           response.new(200)
           |> mist.bit_builder_response(
             body
